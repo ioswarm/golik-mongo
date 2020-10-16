@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/ioswarm/golik"
-	"github.com/ioswarm/golik/db"
 	mgo "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
@@ -103,7 +102,7 @@ func (ms *MongoService) Database() *mgo.Database {
 	return ms.database
 }
 
-func (ms *MongoService) CreateConnectionPool(settings *db.ConnectionPoolSettings) (golik.CloveRef, error) {
+func (ms *MongoService) CreateConnectionPool(settings *golik.ConnectionPoolSettings) (golik.CloveRef, error) {
 	if settings.Type.Kind() != reflect.Struct {
 		return nil, errors.New("Given type must be a struct")
 	}
@@ -132,6 +131,6 @@ func (ms *MongoService) CreateConnectionPool(settings *db.ConnectionPoolSettings
 		settings.CreateHandler = defaultHandlerCreation(collection, settings.Type, settings.IndexField, settings.Behavior)
 	}
 
-	clove := db.NewConnectionPool(settings)
+	clove := golik.NewConnectionPool(settings)
 	return ms.handler.Execute(clove)
 }

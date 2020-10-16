@@ -9,7 +9,6 @@ import (
 
 	"github.com/ioswarm/golik"
 	mongo "github.com/ioswarm/golik-mongo"
-	"github.com/ioswarm/golik/db"
 )
 
 type Person struct {
@@ -29,7 +28,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	pool, err := mgo.CreateConnectionPool(&db.ConnectionPoolSettings{
+	pool, err := mgo.CreateConnectionPool(&golik.ConnectionPoolSettings{
 		Name: "person",
 		Type: reflect.TypeOf(Person{}),
 		PoolSize: 10,
@@ -38,14 +37,14 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Println("Got:", <-pool.Request(context.Background(), db.Create(&Person{
+	fmt.Println("Got:", <-pool.Request(context.Background(), golik.Create(&Person{
 		Email: "test@test.de",
 		Name: "Test Testamnn",
 		Age: 17,
 	})))
 
-	fmt.Println("Got:", <-pool.Request(context.Background(), db.Get("test@test.de")))
-	fmt.Println("Got:", <-pool.Request(context.Background(), db.Delete("test@test.de")))
+	fmt.Println("Got:", <-pool.Request(context.Background(), golik.Get("test@test.de")))
+	fmt.Println("Got:", <-pool.Request(context.Background(), golik.Delete("test@test.de")))
 
 	os.Exit(<-sys.Terminated())
 }

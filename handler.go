@@ -8,20 +8,18 @@ import (
 	"time"
 
 	"github.com/ioswarm/golik"
-	"github.com/ioswarm/golik/db"
-	"github.com/ioswarm/golik/filter"
 	"go.mongodb.org/mongo-driver/bson"
 	mgo "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func defaultHandlerCreation(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) db.HandlerCreation {
-	return func(ctx golik.CloveContext) (db.Handler, error) {
+func defaultHandlerCreation(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) golik.HandlerCreation {
+	return func(ctx golik.CloveContext) (golik.Handler, error) {
 		return NewMongoHandler(collection, itype, indexField, behavior)
 	}
 }
 
-func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) (db.Handler, error) {
+func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) (golik.Handler, error) {
 	if collection == nil {
 		return nil, errors.New("Collection is not defined [nil]")
 	}
@@ -32,17 +30,17 @@ func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField 
 	fld := indexField
 	if indexField == "" {
 		if itype.NumField() == 0 {
-			return nil, errors.New("Give type has no fields")
+			return nil, errors.New("Given type has no fields")
 		}
 		ftype := itype.Field(0)
-		fld = db.CamelCase(ftype.Name)
+		fld = golik.CamelCase(ftype.Name)
 	}
 
 	return &mongoHandler{
 		collection: collection,
 		itype:      itype,
 		indexField: fld,
-		converter:  db.NewConverter().NameMapping(fld, "_id"),
+		converter:  golik.NewConverter().NameMapping(fld, "_id"),
 		behavior:   behavior,
 	}, nil
 }
@@ -51,7 +49,7 @@ type mongoHandler struct {
 	collection *mgo.Collection
 	itype      reflect.Type
 	indexField string
-	converter  db.Converter
+	converter  golik.Converter
 	behavior   interface{}
 }
 
@@ -78,7 +76,7 @@ func (h *mongoHandler) encode(bson bson.M) (interface{}, error) {
 	return ptrvalue.Interface(), nil
 }
 
-func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *filter.Filter) (*filter.Result, error) {
+func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik.Result, error) {
 	cond, err := flt.Condition()
 	if err != nil {
 		return nil, err // TODO
@@ -113,7 +111,7 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *filter.Filter) (*filt
 		results = append(results, value)
 	}
 
-	return &filter.Result{
+	return &golik.Result{
 		From:   flt.From,
 		Size:   len(results),
 		Count:  0, // TODO
@@ -121,7 +119,7 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *filter.Filter) (*filt
 	}, nil
 }
 
-func (h *mongoHandler) Create(ctx golik.CloveContext, cmd *db.CreateCommand) error {
+func (h *mongoHandler) Create(ctx golik.CloveContext, cmd *golik.CreateCommand) error {
 	bson, err := h.decode(cmd.Entity)
 	if err != nil {
 		return err
@@ -132,11 +130,11 @@ func (h *mongoHandler) Create(ctx golik.CloveContext, cmd *db.CreateCommand) err
 	return err
 }
 
-func (h *mongoHandler) Read(ctx golik.CloveContext, cmd *db.GetCommand) (interface{}, error) {
+func (h *mongoHandler) Read(ctx golik.CloveContext, cmd *golik.GetCommand) (interface{}, error) {
 	if cmd.Id == nil {
 		return nil, errors.New("Give id is nil")
 	}
-	flt := &filter.Filter{Filter: fmt.Sprintf("_id eq %v", cmd.Id), Size: 1}
+	flt := &golik.Filter{Filter: fmt.Sprintf("_id eq %v", cmd.Id), Size: 1}
 	if str, ok := cmd.Id.(string); ok {
 		flt.Filter = fmt.Sprintf("_id eq '%v'", str)
 	}
@@ -152,7 +150,7 @@ func (h *mongoHandler) Read(ctx golik.CloveContext, cmd *db.GetCommand) (interfa
 	return nil, fmt.Errorf("Could not find entity with id %v", cmd.Id) // TODO define default errors
 }
 
-func (h *mongoHandler) Update(ctx golik.CloveContext, cmd *db.UpdateCommand) error {
+func (h *mongoHandler) Update(ctx golik.CloveContext, cmd *golik.UpdateCommand) error {
 	data, err := h.decode(cmd.Entity)
 	if err != nil {
 		return err
@@ -162,8 +160,8 @@ func (h *mongoHandler) Update(ctx golik.CloveContext, cmd *db.UpdateCommand) err
 	return err
 }
 
-func (h *mongoHandler) Delete(ctx golik.CloveContext, cmd *db.DeleteCommand) (interface{}, error) {
-	data, err := h.Read(ctx, &db.GetCommand{Id: cmd.Id})
+func (h *mongoHandler) Delete(ctx golik.CloveContext, cmd *golik.DeleteCommand) (interface{}, error) {
+	data, err := h.Read(ctx, &golik.GetCommand{Id: cmd.Id})
 	if err != nil {
 		return nil, err
 	}

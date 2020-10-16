@@ -3,63 +3,63 @@ package mongo
 import (
 	"fmt"
 
-	"github.com/ioswarm/golik/filter"
+	"github.com/ioswarm/golik"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func NewFilter(cond filter.Condition) (bson.M, error) {
+func NewFilter(cond golik.Condition) (bson.M, error) {
 	return interpretCondition(cond)
 }
 
-func interpretCondition(condition filter.Condition) (bson.M, error) {
+func interpretCondition(condition golik.Condition) (bson.M, error) {
 	switch condition.(type) {
-	case filter.Operand:
-		operand := condition.(filter.Operand)
+	case golik.Operand:
+		operand := condition.(golik.Operand)
 		return interpretOperand(operand)
-	case filter.Logic:
-		logic := condition.(filter.Logic)
+	case golik.Logic:
+		logic := condition.(golik.Logic)
 		return interpretLogical(logic)
-	case filter.LogicNot:
-		not := condition.(filter.LogicNot)
+	case golik.LogicNot:
+		not := condition.(golik.LogicNot)
 		return interpretNot(not)
-	case filter.Grouping:
-		grp := condition.(filter.Grouping)
+	case golik.Grouping:
+		grp := condition.(golik.Grouping)
 		return interpretCondition(grp.InnerGroup())
 	default:
 		return nil, fmt.Errorf("Unsupported condition %T", condition)
 	}
 }
 
-func interpretOperand(op filter.Operand) (bson.M, error) {
+func interpretOperand(op golik.Operand) (bson.M, error) {
 	switch op.Operator() {
-	case filter.EQ:
+	case golik.EQ:
 		return bson.M{op.Attribute() : bson.M{"$eq" : op.Value() }}, nil
-	case filter.NE:
+	case golik.NE:
 		return bson.M{op.Attribute() : bson.M{"$ne" : op.Value() }}, nil
-	case filter.CO:
+	case golik.CO:
 		return bson.M{op.Attribute() : bson.M{"$regex" : fmt.Sprintf("/^.*%v.*$/", op.Value()) }}, nil
-	case filter.SW:
+	case golik.SW:
 		return bson.M{op.Attribute() : bson.M{"$regex" : fmt.Sprintf("/^%v/", op.Value()) }}, nil
-	case filter.EW:
+	case golik.EW:
 		return bson.M{op.Attribute() : bson.M{"$regex" : fmt.Sprintf("/%v$/", op.Value()) }}, nil
-	case filter.PR:
+	case golik.PR:
 		return bson.M{op.Attribute() : bson.M{"$exists" : true }}, nil
-	case filter.GT:
+	case golik.GT:
 		return bson.M{op.Attribute() : bson.M{"$gt" : op.Value() }}, nil
-	case filter.GE:
+	case golik.GE:
 		return bson.M{op.Attribute() : bson.M{"$gte" : op.Value() }}, nil
-	case filter.LT:
+	case golik.LT:
 		return bson.M{op.Attribute() : bson.M{"$lt" : op.Value() }}, nil
-	case filter.LE:
+	case golik.LE:
 		return bson.M{op.Attribute() : bson.M{"$lte" : op.Value() }}, nil
 	default:
 		return nil, fmt.Errorf("Unsupported operator %v", op.Operator())
 	}
 }
 
-func interpretLogical(logic filter.Logic) (bson.M, error) {
+func interpretLogical(logic golik.Logic) (bson.M, error) {
 	switch logic.Logical() {
-	case filter.AND:
+	case golik.AND:
 		l, err := interpretCondition(logic.Left())
 		if err != nil {
 			return nil, err
@@ -69,7 +69,7 @@ func interpretLogical(logic filter.Logic) (bson.M, error) {
 			return nil, err
 		}
 		return bson.M{"$and" : bson.A{l, r} }, nil
-	case filter.OR:
+	case golik.OR:
 		l, err := interpretCondition(logic.Left())
 		if err != nil {
 			return nil, err
@@ -84,7 +84,7 @@ func interpretLogical(logic filter.Logic) (bson.M, error) {
 	}
 }
 
-func interpretNot(not filter.LogicNot) (bson.M, error) {
+func interpretNot(not golik.LogicNot) (bson.M, error) {
 	inner, err := interpretCondition(not.InnerNot())
 	if err != nil {
 		return nil, err
