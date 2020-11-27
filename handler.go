@@ -61,13 +61,6 @@ func (h *mongoHandler) decode(i interface{}) (bson.M, error) {
 	return bson.M(rmap), nil
 }
 
-/*
-func (h *mongoHandler) encode(bson bson.M, i interface{}) error {
-	itype := reflect.TypeOf(i)
-	return h.encodeType(bson, itype)
-}
-*/
-
 func (h *mongoHandler) encode(bson bson.M) (interface{}, error) {
 	ptrvalue := reflect.New(h.itype)
 	if err := h.converter.Encode(bson, ptrvalue); err != nil {

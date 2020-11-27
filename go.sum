@@ -141,8 +141,8 @@ github.com/hashicorp/mdns v1.0.0/go.mod h1:tL+uN++7HEJ6SQLQ2/p+z2pH24WQKWjBPkE0m
 github.com/hashicorp/memberlist v0.1.3/go.mod h1:ajVTdAv/9Im8oMAAj5G31PhhMCZJV2pPBoIllUwCN7I=
 github.com/hashicorp/serf v0.8.2/go.mod h1:6hOLApaqBFA1NXqRQAsxw9QxuDEvNxSQRwA/JwenrHc=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
-github.com/ioswarm/golik v0.2.2-alpha.1 h1:ECoiOy7uva++LL52RFw7fQU3l4HuGRHCXb7GxGMTQ3o=
-github.com/ioswarm/golik v0.2.2-alpha.1/go.mod h1:zEYL+/Jcp55ixYjyGDCRDfIdUBQw3JZYvZoLoY/urwY=
+github.com/ioswarm/golik v0.2.2-alpha.13 h1:lCFIThjbWl+mlpf3zQ6PFDYTiZ4Dj52gEBhM7eytEmI=
+github.com/ioswarm/golik v0.2.2-alpha.13/go.mod h1:zEYL+/Jcp55ixYjyGDCRDfIdUBQw3JZYvZoLoY/urwY=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
