@@ -40,7 +40,7 @@ func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField 
 		collection: collection,
 		itype:      itype,
 		indexField: fld,
-		converter:  golik.NewConverter().NameMapping(fld, "_id"),
+		converter:  golik.NewConverter().NameMapping(fld, "_id").AddRule(TimestampRule(), TimeRule()),
 		behavior:   behavior,
 	}, nil
 }
