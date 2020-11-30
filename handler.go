@@ -19,7 +19,7 @@ func defaultHandlerCreation(collection *mgo.Collection, itype reflect.Type, inde
 	}
 }
 
-func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) (golik.Handler, error) {
+func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}, rule ...golik.ConvertRule) (golik.Handler, error) {
 	if collection == nil {
 		return nil, errors.New("Collection is not defined [nil]")
 	}
@@ -40,7 +40,7 @@ func NewMongoHandler(collection *mgo.Collection, itype reflect.Type, indexField 
 		collection: collection,
 		itype:      itype,
 		indexField: fld,
-		converter:  golik.NewConverter().NameMapping(fld, "_id").AddRule(TimestampRule(), TimeRule()),
+		converter:  golik.NewConverter().NameMapping(fld, "_id").AddRule(TimestampRule(), TimeRule()).AddRule(rule...),
 		behavior:   behavior,
 	}, nil
 }
