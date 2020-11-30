@@ -149,7 +149,7 @@ func (h *mongoHandler) Update(ctx golik.CloveContext, cmd *golik.UpdateCommand) 
 		return err
 	}
 
-	_, err = h.collection.UpdateOne(ctx, bson.M{"_id": cmd.Id}, data)
+	_, err = h.collection.UpdateOne(ctx, bson.M{"_id": cmd.Id}, bson.M{"$set": data})
 	return err
 }
 
