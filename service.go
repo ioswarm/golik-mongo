@@ -117,6 +117,15 @@ func (ms *MongoService) CreateConnectionPool(settings *golik.ConnectionPoolSetti
 		settings.Options["mongo.database"] = ms.database
 	}
 	if settings.CreateHandler == nil {
+		getAdditionalRules := func() []golik.ConvertRule {
+			if irules, ok := settings.Options["rules"]; ok {
+				if rules, ok := irules.([]golik.ConvertRule); ok {
+					return rules
+				}
+			}
+			return []golik.ConvertRule{}
+		}
+
 		getCollection := func() string {
 			if value, ok := settings.Options["collection"]; ok {
 				if name, ok := value.(string); ok {
@@ -128,7 +137,7 @@ func (ms *MongoService) CreateConnectionPool(settings *golik.ConnectionPoolSetti
 
 		collection := ms.database.Collection(getCollection())
 		settings.Options["mongo.collection"] = collection
-		settings.CreateHandler = defaultHandlerCreation(collection, settings.Type, settings.IndexField, settings.Behavior)
+		settings.CreateHandler = defaultHandlerCreation(collection, settings.Type, settings.IndexField, settings.Behavior, getAdditionalRules()...)
 	}
 
 	clove := golik.NewConnectionPool(settings)

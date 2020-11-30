@@ -13,9 +13,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func defaultHandlerCreation(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}) golik.HandlerCreation {
+func defaultHandlerCreation(collection *mgo.Collection, itype reflect.Type, indexField string, behavior interface{}, rule ...golik.ConvertRule) golik.HandlerCreation {
 	return func(ctx golik.CloveContext) (golik.Handler, error) {
-		return NewMongoHandler(collection, itype, indexField, behavior)
+		return NewMongoHandler(collection, itype, indexField, behavior, rule...)
 	}
 }
 
