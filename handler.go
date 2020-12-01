@@ -78,6 +78,9 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik
 	if err != nil {
 		return nil, err
 	}
+
+	ctx.Debug("Excute filter: %v", mfilter)
+
 	opts := options.Find()
 	opts.SetSkip(int64(flt.From))
 	opts.SetLimit(int64(flt.Size))
