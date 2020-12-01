@@ -87,6 +87,9 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik
 
 	timeout, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer cancel()
+
+	count, _ := h.collection.CountDocuments(context.Background(), mfilter)
+
 	cursor, err := h.collection.Find(context.Background(), mfilter, opts)
 	defer cursor.Close(timeout)
 	if err != nil {
@@ -110,7 +113,7 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik
 	return &golik.Result{
 		From:   flt.From,
 		Size:   len(results),
-		Count:  0, // TODO
+		Count:  int(count), // TODO
 		Result: results,
 	}, nil
 }
