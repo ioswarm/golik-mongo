@@ -57,6 +57,7 @@ func (ms *MongoService) CreateServiceInstance(system golik.Golik) *golik.Clove {
 }
 
 func (ms *MongoService) connect(ctx golik.CloveContext) error {
+	ctx.Debug("Establish connection to %v @ %v with timeout %v", ms.settings.Database, ms.settings.Uri, ms.settings.ConnectionTimeout)
 	ct, cancel := context.WithTimeout(context.Background(), ms.settings.ConnectionTimeout)
 	client, err := mgo.Connect(ct, ms.settings.ClientOptions())
 	defer cancel()
