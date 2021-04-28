@@ -79,7 +79,7 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik
 		return nil, err
 	}
 
-	ctx.Debug("Excute filter: %v", mfilter)
+	ctx.Debug("Execute filter: %v", mfilter)
 
 	opts := options.Find()
 	opts.SetSkip(int64(flt.From))
@@ -91,10 +91,11 @@ func (h *mongoHandler) Filter(ctx golik.CloveContext, flt *golik.Filter) (*golik
 	count, _ := h.collection.CountDocuments(context.Background(), mfilter)
 
 	cursor, err := h.collection.Find(context.Background(), mfilter, opts)
-	defer cursor.Close(timeout)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(timeout)
+
 	results := make([]interface{}, 0)
 	for cursor.Next(timeout) {
 		var res bson.M
